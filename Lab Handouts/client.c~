@@ -1,5 +1,5 @@
 
-/*				THE CLIENT PROCESS
+/*		THE CLIENT PROCESS
 	Please read the file server.c before you read this file. To run this,
 	you must first change the IP address specified in the line:
 	serv_addr.sin_addr.s_addr = inet_addr("144.16.202.221");
