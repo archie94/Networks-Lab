@@ -7,6 +7,8 @@
 */
 
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -33,13 +35,14 @@ main()
 	   THE SERVER.
 	*/
 	serv_addr.sin_family = AF_INET;
-	serv_addr.sin_addr.s_addr = inet_addr("144.16.202.221");
+	//serv_addr.sin_addr.s_addr = inet_addr("144.16.202.221");
+	serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	serv_addr.sin_port = htons(6000);
 
 	/* With the information specified in serv_addr, the connect()
 	   system call establishes a connection with the server process.
 	*/
-	if((connect(socketfd, (struct socketaddr *)&serv_addr, sizeof(serv_addr)))<0){
+	if((connect(sockfd, (struct socketaddr *)&serv_addr, sizeof(serv_addr)))<0){
 		printf("Unable to connect to server\n");
 		exit(0);
 	}
