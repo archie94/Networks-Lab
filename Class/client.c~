@@ -15,6 +15,10 @@ main()
 	char buf[100];
 	char buff[100];
 	
+	/*
+	Opening a socket 
+	Check whether opening is successful or not
+	*/
 	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 		printf("Unable to create socket\n");
 	}
@@ -25,6 +29,9 @@ main()
 	serv_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 	serv_addr.sin_port = htons(6000);
 	
+	/*
+	Establish a connection with the server process
+	*/
 	if((connect(sockfd, (struct socketaddr *)&serv_addr, sizeof(serv_addr)))<0){
 		printf("Unable to connect to server\n");
 		exit(0);
@@ -42,13 +49,18 @@ main()
 		printf("Enter an expression : ");
 		gets(buf);
 		int k = 0;
+		/*
+		Remove extra spaces from input expression
+		*/
 		for(i=0;i<strlen(buf);i++,k++){
 			while(buf[i] == 32){
 				i++;
 			}
 			buff[k] = buf[i];
 		}
-		
+		/*
+		If input expression is "-1" we will terminate the client
+		*/
 		if(!strcmp(buff,"-1")){
 			break;
 		}

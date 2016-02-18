@@ -20,6 +20,7 @@ main()
 	struct sockaddr_in cli_addr, serv_addr;
 	
 	int i;
+	int bufLen;
 	char buf[100];
 	char msg[100];
 	
@@ -40,73 +41,79 @@ main()
 
 	listen(sockfd, 5);
 	
-	printf("Server running ... waiting for client\n");
 	
-	clientLen = sizeof(cli_addr);
-	newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clientLen);
-	if(newsockfd < 0){
-		printf("Accept error\n");
-		exit(0);
-	}
-
-	while(1){
-		
-		
-		for(i=0;i<100;i++) buf[i] = '\0';
-		recv(newsockfd, buf, 100, 0);
-		printf("Received message : %s\n", buf);
-		
-		// parse the msg here 
-		int l,k,i;
-		int num[2]={0};
-		int op = -1;
-		k = 0;
-		for(i=0;i<strlen(buf);i++){
-			if(buf[i]=='+' || buf[i]=='-' || buf[i] =='*' || buf[i]=='/'){
-				
-				
-				if(k == 0){
-					k++; 
-				}else if(k == 1){
-					if(op == 0)
-						num[0] = num[0] + num[1];
-					else if(op == 1)
-						num[0] = num[0] - num[1];
-					else if(op == 2)
-						num[0] = num[0] * num[1];
-					else if(op == 3)
-						num[0] = num[0] / num[1];
-					num[1] = 0;
-				}
-				
-				
-				if(buf[i] == '+'){
-					op = 0;
-				}else if(buf[i] == '-'){
-					op = 1;
-				}else if(buf[i] == '*'){
-					op = 2;
-				}else{
-					op = 3;
-				}
-			}
-			else
-				num[k] = num[k]*10 + (buf[i]-'0');
+	
+	while(1)
+	{
+		printf("Server running ... waiting for client\n");
+		clientLen = sizeof(cli_addr);
+		newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clientLen);
+		if(newsockfd < 0){
+			printf("Accept error\n");
+			exit(0);
 		}
+
+		bufLen = 1;
+		while(bufLen){
 		
-		if(op == 0)
-			num[0] = num[0] + num[1];
-		else if(op == 1)
-			num[0] = num[0] - num[1];
-		else if(op == 2)
-			num[0] = num[0] * num[1];
-		else if(op == 3)
-			num[0] = num[0] / num[1];
 		
-		sprintf(msg, "%d",num[0]);
-		send(newsockfd, msg, strlen(msg) + 1, 0);
+			for(i=0;i<100;i++) buf[i] = '\0';
+			bufLen = recv(newsockfd, buf, 100, 0);
+			printf("Received message : %s\n", buf);
 		
+			// parse the msg here 
+			int l,k,i;
+			int num[2]={0};
+			int op = -1;
+			k = 0;
+			for(i=0;i<strlen(buf);i++){
+				if(buf[i]=='+' || buf[i]=='-' || buf[i] =='*' || buf[i]=='/'){
+					
+					
+					if(k == 0){
+						k++; 
+					}else if(k == 1){
+						if(op == 0)
+							num[0] = num[0] + num[1];
+						else if(op == 1)
+							num[0] = num[0] - num[1];
+						else if(op == 2)
+							num[0] = num[0] * num[1];
+						else if(op == 3)
+							num[0] = num[0] / num[1];
+						num[1] = 0;
+					}
+				
+					
+					if(buf[i] == '+'){
+						op = 0;
+					}else if(buf[i] == '-'){
+						op = 1;
+					}else if(buf[i] == '*'){
+						op = 2;
+					}else{
+						op = 3;
+					}
+				}
+				else
+				num[k] = num[k]*10 + (buf[i]-'0');
+			}
+		
+			if(op == 0)
+				num[0] = num[0] + num[1];
+			else if(op == 1)
+				num[0] = num[0] - num[1];
+			else if(op == 2)
+				num[0] = num[0] * num[1];
+			else if(op == 3)
+				num[0] = num[0] / num[1];
+			
+			sprintf(msg, "%d",num[0]);
+			send(newsockfd, msg, strlen(msg) + 1, 0);
+			
+		}	
+		printf("------------Disconnecting CLient from Server-------------------------\n");
+		close(newsockfd);
 	}
-	close(newsockfd);
 }
 
