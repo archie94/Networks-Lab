@@ -1,4 +1,9 @@
-
+/*
+		GROUP NO : 17
+	@authors:	Anubhav Patnaik 13/CS/26
+			Arka Prava Basu 13/CS/32
+		
+*/
 /*
 	A TCP iterative server which takes an arithmetic expression from client 
 	and sends the result of the expression back to the client.
@@ -41,10 +46,11 @@ main()
 
 	listen(sockfd, 5);
 	
-	printf("Server running ... waiting for client\n");
+	
 	
 	while(1)
 	{
+		printf("Server running ... waiting for client\n");
 		clientLen = sizeof(cli_addr);
 		newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clientLen);
 		if(newsockfd < 0){

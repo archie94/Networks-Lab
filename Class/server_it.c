@@ -1,4 +1,9 @@
-
+/*
+		GROUP NO : 17
+	@authors:	Anubhav Patnaik 13/CS/26
+			Arka Prava Basu 13/CS/32
+		
+*/
 /*
 	A TCP iterative server which takes an arithmetic expression from client 
 	and sends the result of the expression back to the client.
@@ -27,7 +32,7 @@ main()
 	// Check if socket creation fails 
 	if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0){
 		printf("cant create socket\n");
-	exit(0);
+		exit(0);
 	}
 
 	serv_addr.sin_family = AF_INET;

@@ -1,3 +1,11 @@
+/*
+		GROUP NO : 17
+	@authors:	Anubhav Patnaik 13/CS/26
+			Arka Prava Basu 13/CS/32
+		
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
