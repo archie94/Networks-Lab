@@ -1,0 +1,3 @@
+Client will send a string to server. Server will reply with a message whether it is pallindrome or not. 
+Note that some client will send data over UDP socket while some over TCP socket. Thus server will have to know how to open both TCP and UDP socket and accept them.
+Use select function to make the server wait for any one of the two connection and and handle which ever comes first. All handlings are iterative.
