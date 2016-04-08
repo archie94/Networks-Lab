@@ -1,0 +1,91 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <sys/time.h>
+#include <sys/socket.h>
+
+int main() {
+	int sockfd;
+	struct sockaddr_in serv_addr, cli_addr;
+	int fdmax = 0, i, j, k, bytes;
+	
+	socklen_t addrlen = sizeof(cli_addr);
+	char buff[100];
+	
+	fd_set master;
+	fd_set read_fd;
+	
+	if(( sockfd = socket( AF_INET, SOCK_DGRAM, 0)) < 0) {
+		printf("Cananot create socket\n");
+		exit(0);
+	}
+	
+	serv_addr.sin_family = AF_INET;
+	serv_addr.sin_addr.s_addr = INADDR_ANY;
+	serv_addr.sin_port = htons(6000);
+	
+	if( bind( sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+		printf("Cannot bind to port\n");
+		exit(0);
+	}
+	
+	FD_ZERO( &master);
+	FD_ZERO( &read_fd);
+	
+	FD_SET( sockfd, &master);
+	fdmax = sockfd;
+	
+	while(1) {
+		read_fd = master;
+		printf("select for select\n");
+		if( select( fdmax + 1, &read_fd, NULL, NULL, NULL) < 0) {
+			printf("select failed\n");
+			exit(0);
+		}
+		
+		printf("Server select is OK\n");
+		
+		for( i=0; i<=fdmax; i++) {
+			
+			if( FD_ISSET( i, &read_fd)) {
+				for( j=0; j<100; j++) {
+					buff[j] = '0';
+				}
+				
+				if( i == sockfd) { // new client
+					recvfrom( sockfd, buff, 100, 0, (struct sockaddr *)&cli_addr, &addrlen);
+					printf("Received message %s\n", buff);
+					FD_SET( sockfd, &master);
+					if( sockfd > fdmax) {
+						fdmax = sockfd;
+					}
+				}else { // handle data from client
+					if( ( bytes = recvfrom( sockfd, buff, 100, 0, (struct sockaddr *)&cli_addr, &addrlen)) <= 0) {
+						if( bytes == 0) {
+							printf(" Connection closed by client \n");
+						}else {
+							printf(" recvfrom error\n");
+						}
+						close(i);
+						FD_CLR( i, &master);
+					}else { // we got message from client 
+						// send to everyone 
+						for(j=0;j<=fdmax;j++) {
+							if( FD_ISSET( j, &read_fd)) {
+								if( j != sockfd) { // do not send to server
+									printf( " sending %s \n", buff);
+									sendto( sockfd, buff, sizeof(buff) + 1, 0, (struct sockaddr *)&cli_addr, addrlen);
+								}
+							}
+						}
+					}
+				} // data handled
+			}// end of if
+		} // end of for i
+	}// end of while
+	return 0;
+}

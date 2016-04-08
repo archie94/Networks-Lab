@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
+int main() {
+	int sockfd ;
+	struct sockaddr_in serv_addr;
+        socklen_t addrlen=sizeof(serv_addr);
+	int i, sent;
+	char buf[100];
+	char buff[100];
+	
+	if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+		printf("Unable to create socket\n");
+		exit(0);
+	}
+	
+	serv_addr.sin_family= AF_INET;
+	serv_addr.sin_addr.s_addr= inet_addr("127.0.0.1");
+	serv_addr.sin_port= htons(6000);
+	
+	while(1) {
+		for(i=0; i<100; i++){
+			buf[i] = '\0';
+			buff[i] = '\0';
+		}
+		
+		fd_set rfd, wfd;
+		struct timeval tv;
+		
+		tv.tv_sec = 0;
+		tv.tv_usec = 0;
+		FD_ZERO( &rfd);
+		FD_ZERO( &wfd);
+		
+		FD_SET( sockfd, &rfd);
+		//FD_SET( sockfd, &wfd);
+		FD_SET( STDIN_FILENO, &rfd);
+		
+		if( (select( sockfd + 1, &rfd, NULL, NULL, &tv) < 0)) {
+			printf(" Select error \n");
+			exit(0);
+		}
+		
+		if( FD_ISSET( sockfd, &rfd)) { // we got data ... need to read it
+			recvfrom(sockfd, buff, 100, 0, (struct sockaddr *)&serv_addr, &addrlen);
+			printf("Received result from server = %s\n",buff);
+		}
+		
+		if( FD_ISSET( STDIN_FILENO, &rfd)) {
+			fflush(stdin);
+			printf(">");
+			gets(buf);
+			sent = send(sockfd, buf, strlen(buf) + 1, 0, (struct sockaddr *) &serv_addr,sizeof(serv_addr));
+			printf("-------------Sent %d bytes to server--------------\n", sent);
+		}
+	}
+	printf("----------------Closing client------------------ \n");
+	close(sockfd);
+}
